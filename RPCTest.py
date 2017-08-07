@@ -1,10 +1,14 @@
 import time
+import numpy as np
+import cv2
+
 
 from Utilities.mbedRPC import *
 
-#serdev = '/dev/ttyACM0'
 
-#mbed = SerialRPC(serdev, 9600)
+serdev = '/dev/ttyACM0'
+
+mbed = SerialRPC(serdev, 9600)
 
  ###########################
  #
@@ -12,8 +16,14 @@ from Utilities.mbedRPC import *
  #
  ###########################
 
-#Sonar Sensor Readings
+#Camera Variables
 
+SEN_CAMERA_PORT = 0
+SEN_CAMERA_INITIALDISGUARDFRAMES = 30 #Number of frames to throw away while the camera adjusts to light levels
+SEN_CAMERA = cv2.VideoCapture(SEN_CAMERA_PORT) #initialises the camera object to the port at SEN_CAMERA_PORT
+
+
+#Sonar Sensor Readings
 global SENREAD_SONAR_FLEFT_READING
 global SENREAD_SONAR_FCENTRE_READING
 global SENREAD_SONAR_FRIGHT_READING
@@ -64,7 +74,20 @@ def SENFUNC_SONAR_getSonarReadings():
 	SENREAD_SONAR_FRIGHT_READING = int(SENREAD_SONAR_FRIGHT_READING)
 
 
-def COMMFUNC_RF_getLatestMessage():
+#Initialise Camera
+#Caputre and disguard SEN_CAMERA_INITIALDISGUARDFRAMES frames to allow the webcam to adjust to light levels etc...
+def SENFUNC_INITIALISE_CAMERA():
+	for i in xrange(SEN_CAMERA_INITIALDISGUARDFRAMES):
+		temp = SENFUNC_CAMERA_CAPTUREIMAGE()
+
+# Captures a single image from the camera and returns it in PIL format
+def SENFUNC_CAMERA_CAPTUREIMAGE():
+ # read is the easiest way to get a full image out of a VideoCapture object.
+ retval, im = SEN_CAMERA.read()
+ return im
+
+#Asks the MBED to return the first message in the queue
+def COMMFUNC_RF_getMessage():
 	result = mbed.rpc("getRFMessage", "run", "")
 	split = result.split("#")
 	messageData = split[1]
@@ -131,22 +154,24 @@ def BEHFUNC_stateMachine():
 	global SEN_LEDSTRUP_PURERED_HIGHINTENSITY
 	global SEN_LEDSTRUP_PUREGREEN_HIGHINTENSITY
 	global SEN_LEDSTRUP_PUREBLUE_HIGHINTENSITY
+	global stopImageCount
 	
 	SENFUNC_SONAR_getSonarReadings()
-
-	print(SENREAD_SONAR_FLEFT_READING)
-	print(SENREAD_SONAR_FCENTRE_READING)
-	print(SENREAD_SONAR_FRIGHT_READING)
+	
 	#If too close to object
 	if SENREAD_SONAR_FLEFT_READING < ROBOT_STOPPING_DISTANCE or SENREAD_SONAR_FCENTRE_READING < ROBOT_STOPPING_DISTANCE or SENREAD_SONAR_FRIGHT_READING < ROBOT_STOPPING_DISTANCE:
 		print("Too Close")
 		MOVFUNC_SERVODRIVER_CLEARALLPWM()
 		ACTFUNC_LEDS_SETBLOCKLEDCOLOUR(SEN_LEDSTRUP_PURERED_LOWINTENSITY)
-		MOVFUNC_SERVODRIVER_CHANGESPEED(0)
-		MOVFUNC_SERVODRIVER_GOBACKWARD()
-		time.sleep(1)
+		#MOVFUNC_SERVODRIVER_CHANGESPEED(0)
+		#MOVFUNC_SERVODRIVER_GOBACKWARD()
+		#time.sleep(1)
 		#BEHFUNC_reverseHalfSpeed();
 		#justreversed = true;
+		image = SENFUNC_CAMERA_CAPTUREIMAGE()
+		imageName = "/home/pi/robotPi/CapturedImages/image" + str(stopImageCount) + ".png"
+		cv2.imwrite(imageName, image)
+		stopImageCount = stopImageCount + 1
 		
 		
 	#Object to the left
@@ -189,16 +214,34 @@ def BEHFUNC_stateMachine():
 		ACTFUNC_LEDS_SETBLOCKLEDCOLOUR(SEN_LEDSTRUP_PUREGREEN_LOWINTENSITY)
 		MOVFUNC_SERVODRIVER_CHANGESPEED(0)
 		MOVFUNC_SERVODRIVER_GOFORWARD()
-		
 
-#for i in range(0,10):
-	#BEHFUNC_stateMachine()
-	#time.sleep(0.5)
+def regularImageCapture():
+	global start_time
+	global imageCount
+	elapsed_time = time.time() - start_time
+	if elapsed_time > 1:
+		image = SENFUNC_CAMERA_CAPTUREIMAGE()
+		imageName = "/home/pi/robotPi/CapturedImages/experiment2_image"  + str(imageCount) + ".png"
+		cv2.imwrite(imageName, image)
+		imageCount = imageCount + 1
+		print(elapsed_time)
+		start_time = time.time()
 
+
+
+
+SENFUNC_INITIALISE_CAMERA()
+start_time = time.time()
+experimentTime = start_time
+imageCount = 0
+stopImageCount = 0
+print("Time at start is: ", start_time)
+MOVFUNC_SERVODRIVER_CHANGESPEED(0)
 while True:
 	#BEHFUNC_stateMachine()
+	regularImageCapture()
+	MOVFUNC_SERVODRIVER_GOFORWARD()
+
+
 	
-	a = 1
-	
-	
-	#mbed.ser.close()
+#mbed.ser.close()

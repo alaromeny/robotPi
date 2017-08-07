@@ -5,5 +5,5 @@
 # ------------------------------------------------------------------
 
 cd /
-cd home/pi/MBED
+cd /home/pi/robotPi
 sudo python RPCTest.py 
