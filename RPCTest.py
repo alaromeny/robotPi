@@ -1,10 +1,10 @@
 import time
 
-from MBEDUtilities.mbedRPC import *
+from Utilities.mbedRPC import *
 
-serdev = '/dev/ttyACM0'
+#serdev = '/dev/ttyACM0'
 
-mbed = SerialRPC(serdev, 9600)
+#mbed = SerialRPC(serdev, 9600)
 
  ###########################
  #
@@ -196,7 +196,9 @@ def BEHFUNC_stateMachine():
 	#time.sleep(0.5)
 
 while True:
-	BEHFUNC_stateMachine()
-
-
-mbed.ser.close()
+	#BEHFUNC_stateMachine()
+	
+	a = 1
+	
+	
+	#mbed.ser.close()
