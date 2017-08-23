@@ -94,6 +94,8 @@ global SEN_LEDSTRUP_PURERED_HIGHINTENSITY
 global SEN_LEDSTRUP_PUREGREEN_HIGHINTENSITY
 global SEN_LEDSTRUP_PUREBLUE_HIGHINTENSITY
 
+global SEN_LEDPARTYMODE
+
 #Set Variables
 ROBOT_STOPPING_DISTANCE = 250
 ROBOT_DANGER_DISTANCE = 500
@@ -224,6 +226,8 @@ def ACTFUNC_LEDS_SETDOUBLECOLOUR(colourLeft, colourRight):
 	doubleColour = colourLeft + colourRight
 	result = mbed.rpc("setLEDDoubleColour", "run", doubleColour)
 
+def ACTFUNC_LEDS_TOGGLEPARTMODE():
+	result = mbed.rpc("setLEDDoubleColour", "run", setLEDPartyMode)
 
 
 def BEHFUNC_stateMachine():
@@ -361,6 +365,7 @@ Label(text="Change Colour", width=15, height=4).grid(row=1,column=5)
 Button(text='Red', width=10, command=BUTFUNC_REDLEDS, height=4).grid(row=2,column=5)
 Button(text='Green', width=10, command=BUTFUNC_GREENLEDS, height=4).grid(row=3,column=5)
 Button(text='Blue', width=10, command=BUTFUNC_BLUELEDS, height=4).grid(row=4,column=5)
+Button(text='Party Mode', width=10, command=ACTFUNC_LEDS_TOGGLEPARTMODE, height=4).grid(row=5,column=5)
 
 Label(text="", width=15, height=4).grid(row=6,column=6)
 
