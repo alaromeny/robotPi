@@ -32,6 +32,18 @@ from Tkinter import *
 from Utilities.mbedRPC import *
 
 
+
+# initialize dlib's face detector (HOG-based) and then create
+# the facial landmark predictor
+print("[INFO] loading facial landmark predictor...")
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
+# initialize the video stream and allow the cammera sensor to warmup
+print("[INFO] camera sensor warming up...")
+vs = VideoStream().start()
+time.sleep(2.0)
+
 log = open("/home/pi/robotPi/log.txt", "w")
 print("Encoder Readings:", file = log)
 
@@ -143,6 +155,64 @@ def SENFUNC_CAMERA_CAPTUREIMAGE():
  # read is the easiest way to get a full image out of a VideoCapture object.
  retval, im = SEN_CAMERA.read()
  return im
+
+
+def BEHFUNC_DETECTFACES():
+	# loop over the frames from the video stream
+	while True:
+		# grab the frame from the threaded video stream, resize it to
+		# have a maximum width of 400 pixels, and convert it to
+		# grayscale
+		frame = vs.read()
+		frame = imutils.resize(frame, width=400)
+		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+	 
+		# detect faces in the grayscale frame
+		rects = detector(gray, 0)
+		# loop over the face detections
+		for rect in rects:
+			# determine the facial landmarks for the face region, then
+			# convert the facial landmark (x, y)-coordinates to a NumPy
+			# array
+			shape = predictor(gray, rect)
+			shape = face_utils.shape_to_np(shape)
+	 
+			# loop over the (x, y)-coordinates for the facial landmarks
+			# and draw them on the image
+			minX = 9999
+			maxX = 0
+			minY = 9999
+			maxY = 0
+			for (x, y) in shape:
+				if x<minX:
+					minX = x
+				if y<minY:
+					minY = y
+				if x>maxX:
+					maxX = x
+				if y>maxY:
+					maxY = y
+				# cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
+
+
+			deltaX = maxX-minX
+			deltaY = maxY-minY
+			x = maxX - (deltaX/2)
+			y = maxY - (deltaY/2)
+			radius = int(deltaY*0.7)
+
+
+			cv2.circle(frame, (x, y), radius, (0, 255, 0), 3)
+		  
+		# show the frame
+		cv2.imshow("Frame", frame)
+		key = cv2.waitKey(1) & 0xFF
+	 
+		# if the `q` key was pressed, break from the loop
+		if key == ord("q"):
+			break
+	cv2.destroyAllWindows()
+
 
 
 
@@ -368,6 +438,11 @@ Button(text='Blue', width=10, command=BUTFUNC_BLUELEDS, height=4).grid(row=4,col
 Button(text='Party Mode', width=10, command=ACTFUNC_LEDS_TOGGLEPARTMODE, height=4).grid(row=5,column=5)
 
 Label(text="", width=15, height=4).grid(row=6,column=6)
+
+Label(text="Vision", width=15, height=4).grid(row=1,column=7)
+Button(text='Find Faces', width=10, command=BEHFUNC_DETECTFACES, height=4).grid(row=2,column=7)
+
+Label(text="", width=15, height=4).grid(row=6,column=8)
 
 
 mainloop()
