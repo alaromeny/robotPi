@@ -227,7 +227,7 @@ def ACTFUNC_LEDS_SETDOUBLECOLOUR(colourLeft, colourRight):
 	result = mbed.rpc("setLEDDoubleColour", "run", doubleColour)
 
 def ACTFUNC_LEDS_TOGGLEPARTMODE():
-	result = mbed.rpc("setLEDDoubleColour", "run", setLEDPartyMode)
+	result = mbed.rpc("setLEDPartyMode", "run", "")
 
 
 def BEHFUNC_stateMachine():
