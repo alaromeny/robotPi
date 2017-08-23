@@ -335,18 +335,18 @@ Button(text='STOP', width=10, command=MOVFUNC_SERVODRIVER_STOPALLWHEELS, height=
 Label(text="", width=15, height=4).grid(row=5,column=2)
 
 Label(text="Change Speed", width=15, height=4).grid(row=1,column=3)
-Button(text='Fast', width=10, command=counting, height=4).grid(row=2,column=3)
-Button(text='Medium', width=10, command=counting, height=4).grid(row=3,column=3)
-Button(text='Slow', width=10, command=counting, height=4).grid(row=4,column=3)
-Button(text='Crawl', width=10, command=counting, height=4).grid(row=5,column=3)
+Button(text='Fast', width=10, command=MOVFUNC_SERVODRIVER_CHANGESPEED(0), height=4).grid(row=2,column=3)
+Button(text='Medium', width=10, command=MOVFUNC_SERVODRIVER_CHANGESPEED(3), height=4).grid(row=3,column=3)
+Button(text='Slow', width=10, command=MOVFUNC_SERVODRIVER_CHANGESPEED(5), height=4).grid(row=4,column=3)
+Button(text='Crawl', width=10, command=MOVFUNC_SERVODRIVER_CHANGESPEED(7), height=4).grid(row=5,column=3)
 
 
 Label(text="", width=15, height=4).grid(row=6,column=4)
 
 Label(text="Change Colour", width=15, height=4).grid(row=1,column=5)
-Button(text='Red', width=10, command=counting, height=4).grid(row=2,column=5)
-Button(text='Green', width=10, command=counting, height=4).grid(row=3,column=5)
-Button(text='Blue', width=10, command=counting, height=4).grid(row=4,column=5)
+Button(text='Red', width=10, command=ACTFUNC_LEDS_SETBLOCKLEDCOLOUR(SEN_LEDSTRUP_PURERED_LOWINTENSITY), height=4).grid(row=2,column=5)
+Button(text='Green', width=10, command=ACTFUNC_LEDS_SETBLOCKLEDCOLOUR(SEN_LEDSTRUP_PUREGREEN_LOWINTENSITY), height=4).grid(row=3,column=5)
+Button(text='Blue', width=10, command=ACTFUNC_LEDS_SETBLOCKLEDCOLOUR(SEN_LEDSTRUP_PUREBLUE_LOWINTENSITY), height=4).grid(row=4,column=5)
 
 Label(text="", width=15, height=4).grid(row=6,column=6)
 
