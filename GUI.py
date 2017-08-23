@@ -327,9 +327,9 @@ SENFUNC_INITIALISE_CAMERA()
 Label(text="", width=30, height=4).grid(row=0,column=0)
 
 Label(text="Move", width=15, height=4).grid(row=1,column=1)
-Button(text='Forward', width=10, command=counting, height=4).grid(row=2,column=1)
-Button(text='Backward', width=10, command=counting, height=4).grid(row=3,column=1)
-Button(text='STOP', width=10, command=counting, height=4).grid(row=5,column=1)
+Button(text='Forward', width=10, command=MOVFUNC_SERVODRIVER_GOFORWARD, height=4).grid(row=2,column=1)
+Button(text='Backward', width=10, command=MOVFUNC_SERVODRIVER_GOBACKWARD, height=4).grid(row=3,column=1)
+Button(text='STOP', width=10, command=MOVFUNC_SERVODRIVER_STOPALLWHEELS, height=4).grid(row=5,column=1)
 
 
 Label(text="", width=15, height=4).grid(row=5,column=2)
